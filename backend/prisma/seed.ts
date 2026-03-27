@@ -3,6 +3,11 @@ import slugify from "slugify";
 
 const prisma = new PrismaClient();
 
+type ZoneRow = {
+  id: number;
+  name: string;
+};
+
 const zoneMaps: Record<string, string> = {
   "Howling Fjord": "https://wow.zamimg.com/images/wow/maps/enus/normal/495.jpg",
   "Borean Tundra": "https://wow.zamimg.com/images/wow/maps/enus/normal/3537.jpg",
@@ -85,8 +90,8 @@ async function main() {
     });
   }
 
-  const zoneRows = await prisma.zone.findMany();
-  const zoneMap = new Map(zoneRows.map((zone) => [zone.name, zone]));
+  const zoneRows: ZoneRow[] = await prisma.zone.findMany();
+  const zoneMap = new Map<string, ZoneRow>(zoneRows.map((zone: ZoneRow) => [zone.name, zone]));
 
   for (const rare of rares) {
     const zone = zoneMap.get(rare.zone);

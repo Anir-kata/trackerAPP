@@ -5,6 +5,17 @@ import { z } from "zod";
 import { prisma } from "./prisma.js";
 import { serializeRare, serializeZone } from "./serializers.js";
 
+type ZoneRow = Parameters<typeof serializeZone>[0];
+type RareRow = Parameters<typeof serializeRare>[0];
+
+type RareWithZoneRow = RareRow & {
+  zone: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+};
+
 const app = express();
 const port = Number(process.env.PORT || 4000);
 const corsOrigin = process.env.CORS_ORIGIN || "http://localhost:3000";
@@ -18,8 +29,8 @@ app.get("/health", (_req, res) => {
 
 app.get("/zones", async (_req, res, next) => {
   try {
-    const zones = await prisma.zone.findMany({ orderBy: { name: "asc" } });
-    const zoneIds = zones.map((zone) => zone.id);
+    const zones: ZoneRow[] = await prisma.zone.findMany({ orderBy: { name: "asc" } });
+    const zoneIds = zones.map((zone: ZoneRow) => zone.id);
     const sightings = await prisma.sighting.findMany({
       where: { zoneId: { in: zoneIds } },
       orderBy: [{ seenAt: "desc" }],
@@ -37,7 +48,7 @@ app.get("/zones", async (_req, res, next) => {
       }
     }
 
-    res.json(zones.map((zone) => serializeZone(zone, latestByZone.get(zone.id) || null)));
+    res.json(zones.map((zone: ZoneRow) => serializeZone(zone, latestByZone.get(zone.id) || null)));
   } catch (error) {
     next(error);
   }
@@ -68,7 +79,7 @@ app.get("/zones/:id", async (req, res, next) => {
 
     return res.json({
       zone: serializeZone(zone, latestSighting),
-      rares: rares.map((rare) => serializeRare(rare, zone.name)),
+      rares: rares.map((rare: RareRow) => serializeRare(rare, zone.name)),
     });
   } catch (error) {
     return next(error);
@@ -148,7 +159,7 @@ app.get("/rares", async (req, res, next) => {
       orderBy: query.sort === "name" ? [{ name: "asc" }] : [{ completed: "asc" }, { needed: "desc" }, { name: "asc" }],
     });
 
-    res.json(rares.map((rare) => serializeRare(rare, rare.zone.name)));
+    res.json(rares.map((rare: RareWithZoneRow) => serializeRare(rare, rare.zone.name)));
   } catch (error) {
     next(error);
   }
@@ -236,7 +247,7 @@ app.post("/import", async (req, res, next) => {
 
     const payload = payloadSchema.parse(req.body);
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
       for (const zone of payload.zones) {
         await tx.zone.upsert({
           where: { slug: zone.slug },
@@ -257,7 +268,7 @@ app.post("/import", async (req, res, next) => {
       }
 
       const zones = await tx.zone.findMany();
-      const zoneMap = new Map(zones.map((zone) => [zone.slug, zone.id]));
+      const zoneMap = new Map<string, number>(zones.map((zone: ZoneRow) => [zone.slug, zone.id]));
 
       for (const rare of payload.rares) {
         const zoneId = zoneMap.get(rare.zone_slug);
@@ -306,14 +317,14 @@ app.get("/export", async (_req, res, next) => {
     const rares = await prisma.rare.findMany({ include: { zone: true }, orderBy: { name: "asc" } });
 
     return res.json({
-      zones: zones.map((zone) => ({
+      zones: zones.map((zone: ZoneRow) => ({
         name: zone.name,
         slug: zone.slug,
         respawn_min_hours: zone.respawnMinHours,
         respawn_max_hours: zone.respawnMaxHours,
         last_seen_at: zone.lastSeenAt,
       })),
-      rares: rares.map((rare) => ({
+      rares: rares.map((rare: RareWithZoneRow) => ({
         name: rare.name,
         npc_id: rare.npcId,
         zone_slug: rare.zone.slug,
