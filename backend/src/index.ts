@@ -331,18 +331,6 @@ app.get("/export", async (_req, res, next) => {
   }
 });
 
-app.post("/jobs/recompute", async (req, res) => {
-  const auth = req.headers.authorization || "";
-  const expected = `Bearer ${process.env.JOBS_SECRET || ""}`;
-
-  if (!process.env.JOBS_SECRET || auth !== expected) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const zones = await prisma.zone.findMany({ select: { id: true } });
-  return res.json({ ok: true, zonesChecked: zones.length, timestamp: new Date().toISOString() });
-});
-
 app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   if (error instanceof z.ZodError) {
     return res.status(400).json({ message: "Validation error", issues: error.issues });
