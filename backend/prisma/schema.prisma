@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Zone {
+  id              Int       @id @default(autoincrement())
+  name            String    @unique
+  slug            String    @unique
+  respawnMinHours Int       @map("respawn_min_hours")
+  respawnMaxHours Int       @map("respawn_max_hours")
+  lastSeenAt      DateTime? @map("last_seen_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  rares     Rare[]
+  sightings Sighting[]
+
+  @@map("zones")
+}
+
+model Rare {
+  id          Int      @id @default(autoincrement())
+  name        String
+  npcId       Int      @unique @map("npc_id")
+  wowheadUrl  String   @map("wowhead_url")
+  mapImageUrl String?  @map("map_image_url")
+  mapEmbedUrl String?  @map("map_embed_url")
+  spawnPoints Json     @map("spawn_points")
+  needed      Boolean  @default(true)
+  completed   Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  zoneId   Int
+  zone     Zone       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  sightings Sighting[]
+
+  @@index([zoneId])
+  @@map("rares")
+}
+
+model Sighting {
+  id        Int      @id @default(autoincrement())
+  seenAt    DateTime @map("seen_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  zoneId Int
+  zone   Zone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  rareId Int?
+  rare   Rare? @relation(fields: [rareId], references: [id], onDelete: SetNull)
+
+  @@index([zoneId, seenAt])
+  @@index([rareId])
+  @@map("sightings")
+}
