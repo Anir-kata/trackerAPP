@@ -1,19 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import type { Rare } from "@/lib/types";
 
 type Props = {
   rare: Rare;
   onToggleCompleted: (rare: Rare, completed: boolean) => Promise<void>;
   onSeenNow: (rare: Rare) => Promise<void>;
-  onSaveNotes: (rare: Rare, notes: string) => Promise<void>;
 };
 
-export function RareCard({ rare, onToggleCompleted, onSeenNow, onSaveNotes }: Props) {
-  const [notes, setNotes] = useState(rare.notes || "");
-  const [isFlipped, setIsFlipped] = useState(false);
+export function RareCard({ rare, onToggleCompleted, onSeenNow }: Props) {
 
   const copyWaypoints = async () => {
     try {
@@ -24,75 +20,45 @@ export function RareCard({ rare, onToggleCompleted, onSeenNow, onSaveNotes }: Pr
   };
 
   return (
-    <article className={`panel rare-card flashcard ${rare.completed ? "rare-completed" : ""} ${isFlipped ? "is-flipped" : ""}`}>
-      <div className="flashcard-face flashcard-front">
-        <header className="rare-header">
-          <div>
-            <h3>{rare.name}</h3>
-            <p>NPC ID: {rare.npc_id}</p>
-          </div>
-          <div className="rare-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setIsFlipped(true)}>
-              Retourner
-            </button>
-            <Link href={`/rare/${rare.npc_id}`} className="btn btn-secondary">
-              Detail
-            </Link>
-          </div>
-        </header>
-
-        <div className="spawn-list">
-          {rare.spawn_points.map((point, index) => (
-            <code key={`${rare.id}-coord-${index}`}>
-              {point[0]}, {point[1]}
-            </code>
-          ))}
-        </div>
-
-        <div className="rare-footer">
-          <label className="checkbox">
-            <input
-              type="checkbox"
-              checked={rare.completed}
-              onChange={(event) => onToggleCompleted(rare, event.target.checked)}
-            />
-            Complete
-          </label>
-          <button type="button" className="btn" onClick={() => onSeenNow(rare)}>
-            Vu maintenant
-          </button>
-        </div>
+    <article
+      className={`panel rare-card flashcard compact-card ${rare.completed ? "rare-completed" : ""}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onSeenNow(rare)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSeenNow(rare);
+        }
+      }}
+      title="Cliquer pour marquer Vu maintenant"
+    >
+      <div className="compact-head">
+        <h3>{rare.name}</h3>
+        <span className={`completion-pill ${rare.completed ? "is-done" : "is-pending"}`}>
+          {rare.completed ? "Complete" : "A faire"}
+        </span>
       </div>
 
-      <div className="flashcard-face flashcard-back">
-        <header className="rare-header">
-          <div>
-            <h3>Flashcard {rare.name}</h3>
-            <p>Infos de camp et notes</p>
-          </div>
-          <button type="button" className="btn btn-secondary" onClick={() => setIsFlipped(false)}>
-            Recto
-          </button>
-        </header>
+      <div className="compact-actions" onClick={(event) => event.stopPropagation()}>
+        <label className="checkbox">
+          <input
+            type="checkbox"
+            checked={rare.completed}
+            onChange={(event) => onToggleCompleted(rare, event.target.checked)}
+          />
+          Complete
+        </label>
 
         <div className="rare-actions">
+          <Link href={`/rare/${rare.npc_id}`} className="btn btn-secondary">
+            Detail
+          </Link>
           <a href={rare.wowhead_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
-            Ouvrir Wowhead
+            Wowhead
           </a>
           <button type="button" className="btn btn-secondary" onClick={copyWaypoints}>
-            Copier waypoints
-          </button>
-        </div>
-
-        <div className="notes-row">
-          <textarea
-            value={notes}
-            onChange={(event) => setNotes(event.target.value)}
-            placeholder="Notes de camp / rotation"
-            rows={3}
-          />
-          <button type="button" className="btn" onClick={() => onSaveNotes(rare, notes)}>
-            Sauver note
+            Waypoints
           </button>
         </div>
       </div>

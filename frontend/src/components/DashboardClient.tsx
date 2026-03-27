@@ -70,15 +70,6 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
     }
   };
 
-  const onSaveNotes = async (rare: Rare, notes: string) => {
-    try {
-      await api.patchRare(rare.id, { notes });
-      if (activeZone) await refreshZoneDetails(activeZone);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur de note");
-    }
-  };
-
   if (error) {
     return <main className="page-shell">Erreur: {error}</main>;
   }
@@ -115,7 +106,6 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
               rare={rare}
               onToggleCompleted={onToggleCompleted}
               onSeenNow={onSeenNow}
-              onSaveNotes={onSaveNotes}
             />
           ))}
         </div>
