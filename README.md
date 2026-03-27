@@ -4,7 +4,7 @@ Application web complete pour suivre les rares de l achievement Frostbitten:
 
 - Frontend Next.js en local
 - Backend Node.js Express en local
-- Base PostgreSQL locale via Prisma
+- Base SQLite locale via Prisma
 - Cartes WoW style Wowhead avec points de spawn overlay
 - Timers min/max par zone, prediction earliest/latest, statut visuel
 
@@ -12,7 +12,7 @@ Application web complete pour suivre les rares de l achievement Frostbitten:
 
 - frontend: Next.js App Router, UI sombre desktop-first, responsive
 - backend: API REST Express + Prisma
-- database: PostgreSQL local
+- database: SQLite locale (fichier backend/prisma/dev.db)
 
 ## Structure
 
@@ -67,7 +67,7 @@ Le seed insere:
 ### 1) Backend
 
 1. Copier backend/.env.example vers backend/.env
-2. Renseigner DATABASE_URL avec ta base locale
+2. Laisser DATABASE_URL="file:./dev.db" (par defaut)
 3. Installer dependances:
    - cd backend
    - npm install
