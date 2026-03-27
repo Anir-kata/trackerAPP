@@ -51,9 +51,9 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
     return rares.filter((rare) => (remainingOnly ? !rare.completed && rare.needed : true));
   }, [rares, remainingOnly]);
 
-  const onToggleCompleted = async (rare: Rare, completed: boolean) => {
+  const onComplete = async (rare: Rare) => {
     try {
-      await api.patchRare(rare.id, { completed });
+      await api.patchRare(rare.id, { completed: true });
       if (activeZone) await refreshZoneDetails(activeZone);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur de mise a jour");
@@ -104,8 +104,8 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
             <RareCard
               key={rare.id}
               rare={rare}
-              onToggleCompleted={onToggleCompleted}
               onSeenNow={onSeenNow}
+              onComplete={onComplete}
             />
           ))}
         </div>

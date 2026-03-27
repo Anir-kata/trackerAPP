@@ -229,6 +229,32 @@ a {
   gap: 0.45rem;
 }
 
+.compact-subline {
+  margin-top: 0.4rem;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.card-confirm {
+  margin-top: 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 0.45rem;
+  background: #111722;
+}
+
+.card-confirm p {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
 .btn {
   border: 1px solid transparent;
   border-radius: 9px;

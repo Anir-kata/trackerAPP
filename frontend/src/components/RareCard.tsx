@@ -1,37 +1,30 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import type { Rare } from "@/lib/types";
 
 type Props = {
   rare: Rare;
-  onToggleCompleted: (rare: Rare, completed: boolean) => Promise<void>;
   onSeenNow: (rare: Rare) => Promise<void>;
+  onComplete: (rare: Rare) => Promise<void>;
 };
 
-export function RareCard({ rare, onToggleCompleted, onSeenNow }: Props) {
-
-  const copyWaypoints = async () => {
-    try {
-      await navigator.clipboard.writeText(rare.tomtom_waypoints);
-    } catch {
-      console.error("Clipboard not available");
-    }
-  };
+export function RareCard({ rare, onSeenNow, onComplete }: Props) {
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   return (
     <article
       className={`panel rare-card flashcard compact-card ${rare.completed ? "rare-completed" : ""}`}
       role="button"
       tabIndex={0}
-      onClick={() => onSeenNow(rare)}
+      onClick={() => setConfirmOpen(true)}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
           event.preventDefault();
-          onSeenNow(rare);
+          setConfirmOpen(true);
         }
       }}
-      title="Cliquer pour marquer Vu maintenant"
+      title="Cliquer pour choisir Seen ou Complete"
     >
       <div className="compact-head">
         <h3>{rare.name}</h3>
@@ -40,28 +33,38 @@ export function RareCard({ rare, onToggleCompleted, onSeenNow }: Props) {
         </span>
       </div>
 
-      <div className="compact-actions" onClick={(event) => event.stopPropagation()}>
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={rare.completed}
-            onChange={(event) => onToggleCompleted(rare, event.target.checked)}
-          />
-          Complete
-        </label>
+      <div className="compact-subline">Clique pour valider une action</div>
 
-        <div className="rare-actions">
-          <Link href={`/rare/${rare.npc_id}`} className="btn btn-secondary">
-            Detail
-          </Link>
-          <a href={rare.wowhead_url} target="_blank" rel="noreferrer" className="btn btn-secondary">
-            Wowhead
-          </a>
-          <button type="button" className="btn btn-secondary" onClick={copyWaypoints}>
-            Waypoints
-          </button>
+      {confirmOpen ? (
+        <div className="card-confirm" onClick={(event) => event.stopPropagation()}>
+          <p>Choisir une action:</p>
+          <div className="confirm-actions">
+            <button
+              type="button"
+              className="btn"
+              onClick={async () => {
+                await onSeenNow(rare);
+                setConfirmOpen(false);
+              }}
+            >
+              Seen
+            </button>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={async () => {
+                await onComplete(rare);
+                setConfirmOpen(false);
+              }}
+            >
+              Complete
+            </button>
+            <button type="button" className="btn btn-secondary" onClick={() => setConfirmOpen(false)}>
+              Annuler
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
     </article>
   );
 }
