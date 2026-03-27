@@ -5,7 +5,7 @@ Application web complete pour suivre les rares de l achievement Frostbitten:
 - Frontend Next.js en local
 - Backend Node.js Express en local
 - Base SQLite locale via Prisma
-- Cartes WoW style Wowhead avec points de spawn overlay
+- Flashcards de rares par zone (sans maps WoW visuelles)
 - Timers min/max par zone, prediction earliest/latest, statut visuel
 
 ## Architecture
@@ -22,8 +22,8 @@ Application web complete pour suivre les rares de l achievement Frostbitten:
 ## Fonctionnalites
 
 - Dashboard global: zones, rares, statut, prediction
-- Vue zone: liste des rares de la zone
-- Vue rare: detail carte + points
+- Vue zone: liste des rares de la zone en flashcards
+- Vue rare: detail texte et coordonnees
 - Settings: import/export JSON
 - Actions gameplay:
   - marquer un rare complete
@@ -102,9 +102,9 @@ Regle:
 - earliest_spawn = last_seen_at + respawn_min_hours
 - latest_spawn = last_seen_at + respawn_max_hours
 
-## Notes cartes WoW
+## Notes affichage
 
-Les cartes affichent de vraies maps WoW style Wowhead via references statiques WoW map art, avec superposition des points de spawn en pourcentage.
+Le suivi utilise uniquement des flashcards de rares par zone avec les coordonnees de spawn en texte.
 
 ## Commandes utiles
 

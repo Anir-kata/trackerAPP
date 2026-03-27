@@ -44,16 +44,7 @@ export default function RareDetailsPage() {
         <h1>{rare.name}</h1>
         <p>NPC ID: {rare.npc_id}</p>
         <p>Zone: {rare.zone.name}</p>
-        <div className="map-wrapper">
-          <img src={rare.map_image_url || ""} alt={`Carte ${rare.name}`} className="map-image" />
-          {rare.spawn_points.map((point, index) => (
-            <span
-              key={`${rare.id}-${index}`}
-              className="spawn-dot"
-              style={{ left: `${point[0]}%`, top: `${point[1]}%` }}
-            />
-          ))}
-        </div>
+        <p>Carte visuelle retiree: flashcards seulement par zone.</p>
         <div className="spawn-list">
           {rare.spawn_points.map((point, index) => (
             <code key={`${rare.id}-point-${index}`}>

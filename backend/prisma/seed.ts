@@ -8,19 +8,6 @@ type ZoneRow = {
   name: string;
 };
 
-const zoneMaps: Record<string, string> = {
-  "Howling Fjord": "https://wow.zamimg.com/images/wow/maps/enus/normal/495.jpg",
-  "Borean Tundra": "https://wow.zamimg.com/images/wow/maps/enus/normal/3537.jpg",
-  Dragonblight: "https://wow.zamimg.com/images/wow/maps/enus/normal/65.jpg",
-  "Grizzly Hills": "https://wow.zamimg.com/images/wow/maps/enus/normal/394.jpg",
-  "Sholazar Basin": "https://wow.zamimg.com/images/wow/maps/enus/normal/3711.jpg",
-  "The Storm Peaks": "https://wow.zamimg.com/images/wow/maps/enus/normal/67.jpg",
-  ZulDrak: "https://wow.zamimg.com/images/wow/maps/enus/normal/66.jpg",
-  Icecrown: "https://wow.zamimg.com/images/wow/maps/enus/normal/210.jpg",
-  Crystalsong: "https://wow.zamimg.com/images/wow/maps/enus/normal/2817.jpg",
-  Wintergrasp: "https://wow.zamimg.com/images/wow/maps/enus/normal/4197.jpg",
-};
-
 const zones = [
   { name: "Borean Tundra", respawnMinHours: 4, respawnMaxHours: 8 },
   { name: "Howling Fjord", respawnMinHours: 4, respawnMaxHours: 8 },
@@ -105,7 +92,7 @@ async function main() {
         name: rare.name,
         zoneId: zone.id,
         wowheadUrl: wowheadUrl(rare.npcId, rare.name),
-        mapImageUrl: zoneMaps[rare.zone] ?? null,
+        mapImageUrl: null,
         spawnPoints: rare.points,
         needed: true,
         completed: false,
@@ -115,7 +102,7 @@ async function main() {
         npcId: rare.npcId,
         zoneId: zone.id,
         wowheadUrl: wowheadUrl(rare.npcId, rare.name),
-        mapImageUrl: zoneMaps[rare.zone] ?? null,
+        mapImageUrl: null,
         spawnPoints: rare.points,
         needed: true,
         completed: false,

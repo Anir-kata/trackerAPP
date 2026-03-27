@@ -178,6 +178,38 @@ a {
   flex-wrap: wrap;
 }
 
+.flashcard {
+  position: relative;
+  min-height: 250px;
+  perspective: 1100px;
+  transform-style: preserve-3d;
+}
+
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 0.8rem;
+  backface-visibility: hidden;
+  transition: transform 0.35s ease;
+}
+
+.flashcard-front {
+  transform: rotateY(0deg);
+}
+
+.flashcard-back {
+  transform: rotateY(180deg);
+}
+
+.flashcard.is-flipped .flashcard-front {
+  transform: rotateY(-180deg);
+}
+
+.flashcard.is-flipped .flashcard-back {
+  transform: rotateY(0deg);
+}
+
 .btn {
   border: 1px solid transparent;
   border-radius: 9px;
@@ -192,31 +224,6 @@ a {
   background: transparent;
   color: var(--text);
   border-color: var(--border);
-}
-
-.map-wrapper {
-  position: relative;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 0.85rem 0;
-  border: 1px solid var(--border);
-}
-
-.map-image {
-  width: 100%;
-  display: block;
-}
-
-.spawn-dot {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  margin-left: -5px;
-  margin-top: -5px;
-  border-radius: 999px;
-  border: 1px solid #111;
-  background: #ffb300;
-  box-shadow: 0 0 0 4px rgba(255, 179, 0, 0.18);
 }
 
 .spawn-list {

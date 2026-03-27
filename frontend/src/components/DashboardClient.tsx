@@ -94,7 +94,7 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
       <section className="content-column">
         <header className="panel content-header">
           <h1>Frostbitten Tracker</h1>
-          <p>Warmane WotLK 3.3.5 - cartes WoW style Wowhead et suivi temps reel</p>
+          <p>Warmane WotLK 3.3.5 - flashcards de rares par zone et suivi temps reel</p>
           <label className="checkbox">
             <input
               type="checkbox"
