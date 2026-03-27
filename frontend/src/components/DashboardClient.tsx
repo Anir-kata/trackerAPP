@@ -15,7 +15,7 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
   const [zones, setZones] = useState<Zone[]>([]);
   const [activeZone, setActiveZone] = useState<Zone | null>(null);
   const [rares, setRares] = useState<Rare[]>([]);
-  const [remainingOnly, setRemainingOnly] = useState(true);
+  const [selectedRare, setSelectedRare] = useState<Rare | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const activeSlug = useMemo(() => activeZone?.slug || defaultZoneSlug, [activeZone?.slug, defaultZoneSlug]);
@@ -40,21 +40,14 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem("remainingOnly");
-    if (stored === "true") setRemainingOnly(true);
-    if (stored === "false") setRemainingOnly(false);
-
     refreshAll().catch((err) => setError(err instanceof Error ? err.message : "Erreur API"));
   }, [defaultZoneSlug]);
-
-  const displayRares = useMemo(() => {
-    return rares.filter((rare) => (remainingOnly ? !rare.completed && rare.needed : true));
-  }, [rares, remainingOnly]);
 
   const onComplete = async (rare: Rare) => {
     try {
       await api.patchRare(rare.id, { completed: true });
       if (activeZone) await refreshZoneDetails(activeZone);
+      setSelectedRare(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur de mise a jour");
     }
@@ -65,6 +58,7 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
     try {
       await api.patchZoneLastSeen(activeZone.id, rare.id);
       await refreshAll();
+      setSelectedRare(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erreur de timer");
     }
@@ -86,32 +80,40 @@ export function DashboardClient({ defaultZoneSlug }: Props) {
         <header className="panel content-header">
           <h1>Frostbitten Tracker</h1>
           <p>Warmane WotLK 3.3.5 - flashcards de rares par zone et suivi temps reel</p>
-          <label className="checkbox">
-            <input
-              type="checkbox"
-              checked={remainingOnly}
-              onChange={(event) => {
-                setRemainingOnly(event.target.checked);
-                localStorage.setItem("remainingOnly", String(event.target.checked));
-              }}
-            />
-            Rares restants seulement
-          </label>
         </header>
 
         <div className="rares-grid">
-          {displayRares.map((rare) => (
+          {rares.map((rare) => (
             <RareCard
               key={rare.id}
               rare={rare}
-              onSeenNow={onSeenNow}
-              onComplete={onComplete}
+              onRequestAction={setSelectedRare}
             />
           ))}
         </div>
       </section>
 
       <TimerPanel zone={activeZone} />
+
+      {selectedRare ? (
+        <div className="modal-backdrop" onClick={() => setSelectedRare(null)}>
+          <div className="modal-spiral" onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true">
+            <h3>{selectedRare.name}</h3>
+            <p>Choisir une action</p>
+            <div className="confirm-actions">
+              <button type="button" className="btn" onClick={() => onSeenNow(selectedRare)}>
+                Seen
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => onComplete(selectedRare)}>
+                Complete
+              </button>
+              <button type="button" className="btn btn-secondary" onClick={() => setSelectedRare(null)}>
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
